@@ -3,17 +3,17 @@ const int greenPin = 10;
 const int bluePin = 9;
 
 void setup() {
-  // Start off with the LED off.
+
   setColourRgb(0,0,0);
 }
 
 void loop() {
   unsigned int rgbColour[3];
 
-  // Start off with red.
-  rgbColour[0] = 255;
+
+  rgbColour[0] = 0;
   rgbColour[1] = 0;
-  rgbColour[2] = 0;  
+  rgbColour[2] = 255;  
 
   // Choose the colours to increment and decrement.
   for (int decColour = 0; decColour < 3; decColour += 1) {
