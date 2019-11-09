@@ -9,7 +9,7 @@ pinout (physical pins on ATT85)
 ATT85         MMA8451     Other                     ESP8266           temp sensor
 pin5 (D0)         SDA
 pin7 (D2)         SCL
-pin6 (D1)                    test LED (temporary)       CH_PD         power
+pin6 (D1)                                              CH_PD         power
 pin3 (D4)                                               rx
 pin2 (D3/A3)                                            tx            data
 pin1 (RST) - to 10k resistor
