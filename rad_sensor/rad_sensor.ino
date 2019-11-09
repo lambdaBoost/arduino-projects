@@ -7,7 +7,7 @@
  ** CS - pin 10
  **TEMP SENSOR - A0
 */
-#include <SPI.h>
+//#include <SPI.h>
 #include <SD.h>
 
 //GM SETUP

@@ -1,11 +1,13 @@
 /* Three PWM Outputs */
 
 /*
-pink-blue themed rgb led theme powered by atting 85
+pink-blue themed rgb led theme powered by attiny 85
+includes low battery warning for use on lipo batteries
 
 wireup as follows
 
 attiny pin (1-8)    to
+2                   battery +
 3                   LED B
 4                   GND
 5                   LED R
@@ -20,6 +22,7 @@ assume the LED pins go R-GND-G-B
 const int Red = 0;
 const int Green = 1;
 const int Blue = 2;
+const int voltagePin = A3;
 
 volatile uint8_t* Port[] = {&OCR0A, &OCR0B, &OCR1B};
 int Pin[] = {0, 1, 4};
@@ -28,6 +31,7 @@ void setup() {
   pinMode(Pin[Red], OUTPUT);
   pinMode(Pin[Green], OUTPUT);
   pinMode(Pin[Blue], OUTPUT);
+  pinMode(voltagePin, INPUT);
   // Configure counter/timer0 for fast PWM on PB0 and PB1
   TCCR0A = 3<<COM0A0 | 3<<COM0B0 | 3<<WGM00;
   TCCR0B = 0<<WGM02 | 3<<CS00; // Optional; already set
@@ -43,7 +47,9 @@ void setColour (int colour, int intensity) {
 
 void loop() {
 
+int batteryVoltage = analogRead(voltagePin);
 
+if(batteryVoltage >= 696){ //3.4V
 
 //start with blue
   setColour(0,0);
@@ -90,5 +96,13 @@ void loop() {
     delay(5);
   }
 
-
 }
+
+else{
+  setColour(0,0);
+  setColour(1,255);
+  setColour(2,0);
+}
+}
+
+

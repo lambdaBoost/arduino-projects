@@ -20,11 +20,12 @@
 #include <Wire.h>
 #include <Adafruit_MMA8451.h>
 #include <Adafruit_Sensor.h>
+#include<Serial>
 
 Adafruit_MMA8451 mma = Adafruit_MMA8451();
 
 void setup(void) {
-  Serial.begin(250000);
+  Serial.begin(9600);
   
   Serial.println("Adafruit MMA8451 test!");
   
@@ -55,9 +56,9 @@ void loop() {
   mma.getEvent(&event);
 
   /* Display the results (acceleration is measured in m/s^2) */
-  //Serial.print("X: \t"); Serial.print(event.acceleration.x); Serial.print("\t");
-  //Serial.print("Y: \t"); Serial.print(event.acceleration.y); Serial.print("\t");
- /* Serial.print("Z: \t");*/ Serial.print(event.acceleration.z);/* Serial.print("\t");*/ Serial.print(",");Serial.print(millis()); Serial.print(",");
+  Serial.print("X: \t"); Serial.print(event.acceleration.x); Serial.print("\t");
+  Serial.print("Y: \t"); Serial.print(event.acceleration.y); Serial.print("\t");
+  Serial.print("Z: \t"); Serial.print(event.acceleration.z);/* Serial.print("\t"); Serial.print(",");Serial.print(millis()); Serial.print(",");*/
  // Serial.println("m/s^2 ");
   
   /* Get the orientation of the sensor */
