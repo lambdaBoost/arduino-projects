@@ -1,0 +1,18 @@
+Schematic and PCB Check Report
+------------------------------
+
+Report Written:     Sunday, November 10, 2019
+Project Path:       C:\Users\ahall\Documents\git\arduino-projects\Hydrometer\pcb_design\hydrometer_pcb.prj
+Design Path:        C:\Users\ahall\Documents\git\arduino-projects\Hydrometer\pcb_design\hydrometer_pcb.pcb
+Design Title:       
+Created:            09/11/2019 22:41:41
+Last Saved:         10/11/2019 08:59:40
+Editing Time:       626 min
+Units:              mm (precision 1)
+
+
+Checking integrity of Schematic "C:\Users\ahall\Documents\git\arduino-projects\Hydrometer\pcb_design\hydrometer_schematic.sch" with PCB "C:\Users\ahall\Documents\git\arduino-projects\Hydrometer\pcb_design\hydrometer_pcb.pcb"
+================================================================================================================================================================================================================================
+
+
+End Of Report.
