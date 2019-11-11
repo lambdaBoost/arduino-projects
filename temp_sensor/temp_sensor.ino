@@ -19,7 +19,7 @@ void loop()                     // run over and over again
  int reading = analogRead(sensorPin);  
  
  // converting that reading to voltage, for 3.3v arduino use 3.3
- float voltage = reading * 5.0;
+ float voltage = reading * 5;
  voltage /= 1024.0; 
  
  // print out the voltage

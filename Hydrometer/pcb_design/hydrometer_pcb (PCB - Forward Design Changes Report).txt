@@ -1,16 +1,20 @@
 Forward Design Changes Report
 -----------------------------
 
-Report Written:     Sunday, November 10, 2019
+Report Written:     Monday, November 11, 2019
 Project Path:       C:\Users\ahall\Documents\git\arduino-projects\Hydrometer\pcb_design\hydrometer_pcb.prj
 Design Path:        C:\Users\ahall\Documents\git\arduino-projects\Hydrometer\pcb_design\hydrometer_pcb.pcb
 Design Title:       
 Created:            09/11/2019 22:41:41
-Last Saved:         10/11/2019 08:59:40
-Editing Time:       626 min
+Last Saved:         11/11/2019 14:26:53
+Editing Time:       2387 min
 Units:              mm (precision 1)
 
-The designs are the same, so no design changes to forward.
+Disconnected pin "Q2.1" from net "N0054".
+
+Deleted net "N0054".
+
+Connected pin "Q2.1" to net "GND".
 
 
 End Of Report.
