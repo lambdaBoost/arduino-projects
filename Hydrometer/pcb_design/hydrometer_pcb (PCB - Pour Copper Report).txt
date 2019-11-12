@@ -1,19 +1,14 @@
-Forward Design Changes Report
------------------------------
+Pour Copper Report
+------------------
 
 Report Written:     Tuesday, November 12, 2019
 Project Path:       C:\Users\ahall\Documents\git\arduino-projects\Hydrometer\pcb_design\hydrometer_pcb.prj
 Design Path:        C:\Users\ahall\Documents\git\arduino-projects\Hydrometer\pcb_design\hydrometer_pcb.pcb
 Design Title:       
 Created:            09/11/2019 22:41:41
-Last Saved:         12/11/2019 10:21:01
-Editing Time:       3578 min
+Last Saved:         12/11/2019 10:48:28
+Editing Time:       3610 min
 Units:              mm (precision 1)
-
-Added component reference "C4" of component "UPW1A470MDD1TD", package "CAPPRD200W50D525H1250".
-
-Connected pin "C4.1" to net "GND".
-Connected pin "C4.2" to net "N0029".
 
 
 End Of Report.
