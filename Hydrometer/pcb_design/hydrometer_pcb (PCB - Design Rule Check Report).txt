@@ -1,13 +1,13 @@
 Design Rule Check Report
 ------------------------
 
-Report Written:     Tuesday, November 12, 2019
+Report Written:     Thursday, November 14, 2019
 Project Path:       C:\Users\ahall\Documents\git\arduino-projects\Hydrometer\pcb_design\hydrometer_pcb.prj
 Design Path:        C:\Users\ahall\Documents\git\arduino-projects\Hydrometer\pcb_design\hydrometer_pcb.pcb
 Design Title:       
 Created:            09/11/2019 22:41:41
-Last Saved:         12/11/2019 16:56:27
-Editing Time:       3975 min
+Last Saved:         14/11/2019 21:32:00
+Editing Time:       5929 min
 Units:              mm (precision 1)
 
 
