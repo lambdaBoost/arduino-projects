@@ -4,6 +4,9 @@
  * //if need to set eeprom fuse (probably dont need to since eeprom only clears when tiny is reprogrammed): https://dntruong.wordpress.com/2015/07/08/setting-and-reading-attiny85-fuses/
   Arduino Webserver using ESP8266
 
+
+//DOES PRINTLN DO AWAY WITH NEED FOR /R/N? LOOKS LIKELY. POSSIBLY ADDRESS THIS
+//CAN PROBABLY DO AWAY WITH THE ESPSEND AND SENDDATA METHODS AND JUST USE ESP8266.PRINT(LN) THROUGHOUT...SEE HOW IT GOES - LEAVE THEM IF WE HAVE THE MEMORY
  */
 
 //requirements for accelerometer
@@ -34,8 +37,10 @@ String api;
 #include <SoftwareSerial.h>
 #define Rx 3
 #define Tx 4
+#define ESP_en 1
 
 SoftwareSerial esp8266(Rx,Tx); 
+
 
 void setup()
 {
@@ -45,9 +50,6 @@ void setup()
  //Test and initialize the MMA8452
  initMMA8452();
 
-
-
-  
   //Serial.begin(9600);    ///////For Serial monitor 
   esp8266.begin(9600); ///////ESP Baud rate
 
@@ -78,13 +80,29 @@ void setup()
   sendData(F("AT+CWMODE=1\r\n"),1000);
   sendData("AT+CWJAP=\""+ id +"\",\""+ pass +"\""+"\r\n",1000);
   delay(5000);
+
+
+  // Setup for internal temp and vcc measurement
+  ADCSRA &= ~(_BV(ADATE) |_BV(ADIE)); // Clear auto trigger and interrupt enable
+  ADCSRA |= _BV(ADEN);                // Enable AD and start conversion
+  ADMUX = 0xF | _BV( REFS1 );         // ADC4 (Temp Sensor) and Ref voltage = 1.1V;
+  delay(100);                         // Settling time min 1 ms, take 100 ms
+  getADC();
+
   
 }
 
 
+ 
 void loop()
 {
+
+ 
+  
+   //getTempAndVcc();
    updateAccelData();
+
+
 }
  
   //////////////////////////////sends data from ESP to webpage///////////////////////////
@@ -390,4 +408,91 @@ String EEPROM_readString(int add)
    
   return urlChars;
 }*/
+
+
+
+
+
+
+////////////functions to read chip temp and vcc
+
+// Calibration of the temperature sensor has to be changed for your own ATtiny85
+// per tech note: http://www.atmel.com/Images/doc8108.pdf
+float chipTemp(float raw) {
+  const float chipTempOffset = 272.9;           // Your value here, it may vary 
+  const float chipTempCoeff = 1.075;            // Your value here, it may vary
+  return((raw - chipTempOffset) / chipTempCoeff);
+}
+ 
+// Common code for both sources of an ADC conversion
+int getADC() {
+  ADCSRA  |=_BV(ADSC);           // Start conversion
+  while((ADCSRA & _BV(ADSC)));    // Wait until conversion is finished
+  return ADC;
+}
+
+
+void getTempAndVcc(){
+  int i;
+  uint8_t vccIndex;
+  float rawTemp, rawVcc;
+  int t_celsius; 
+  
+  
+  // Measure temperature
+  ADCSRA |= _BV(ADEN);           // Enable AD and start conversion
+  ADMUX = 0xF | _BV( REFS1 );    // ADC4 (Temp Sensor) and Ref voltage = 1.1V;
+  delay(100);                    // Settling time min 1 ms, wait 100 ms
+
+  rawTemp = (float)getADC();     // use next sample as initial average
+  for (int i=2; i<2000; i++) {   // calculate running average for 2000 measurements
+    rawTemp += ((float)getADC() - rawTemp) / float(i); 
+  }  
+  ADCSRA &= ~(_BV(ADEN));        // disable ADC  
+
+  // Measure chip voltage (Vcc)
+  ADCSRA |= _BV(ADEN);   // Enable ADC
+  ADMUX  = 0x0c | _BV(REFS2);    // Use Vcc as voltage reference,
+                                 //    bandgap reference as ADC input
+  delay(100);                    // Settling time min 1 ms, there is
+                                 //    time so wait 100 ms
+  rawVcc = (float)getADC();      // use next sample as initial average
+  for (int i=2; i<2000; i++) {   // calculate running average for 2000 measurements
+    rawVcc += ((float)getADC() - rawVcc) / float(i);
+  }
+  ADCSRA &= ~(_BV(ADEN));        // disable ADC
+  
+  rawVcc = 1024 * 1.1f / rawVcc;
+  //index 0..13 for vcc 1.7 ... 3.0
+  vccIndex = min(max(17,(uint8_t)(rawVcc * 10)),30) - 17;   
+
+  // Temperature compensation using the chip voltage 
+  // with 3.0 V VCC is 1 lower than measured with 1.7 V VCC 
+  t_celsius = (int)(chipTemp(rawTemp) + (float)vccIndex / 13);  
+
+
+//NEED USE PRINT STATEMENTS TO SAVE MEMORY. WILL NEED TO ADD 
+   espsend("\"TCP\",\"api.thingspeak.com\",80",0);
+
+   
+
+
+   
+   String str1 = "GET /update?api_key=";
+   String str3 = "&field1=";
+   String celc = String(t_celsius);
+   int strlength = str1.length()+api.length()+str3.length()+celc.length();
+   //ESP PRINT THE LENGTH OF THE STRING HERE AND END THE AT COMMAND
+
+  esp8266.print("AT+CIPSEND=0,");
+  esp8266.print(strlength);
+   
+   esp8266.print(str1);
+   esp8266.print(api);
+   esp8266.print(str3);
+   esp8266.println(celc);
+  
+}
+
+
 

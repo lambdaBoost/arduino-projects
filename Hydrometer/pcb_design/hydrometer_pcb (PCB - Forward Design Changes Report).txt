@@ -1,16 +1,25 @@
 Forward Design Changes Report
 -----------------------------
 
-Report Written:     Thursday, November 14, 2019
+Report Written:     Saturday, November 16, 2019
 Project Path:       C:\Users\ahall\Documents\git\arduino-projects\Hydrometer\pcb_design\hydrometer_pcb.prj
 Design Path:        C:\Users\ahall\Documents\git\arduino-projects\Hydrometer\pcb_design\hydrometer_pcb.pcb
 Design Title:       
 Created:            09/11/2019 22:41:41
-Last Saved:         14/11/2019 21:15:31
-Editing Time:       5916 min
+Last Saved:         16/11/2019 14:14:10
+Editing Time:       8373 min
 Units:              mm (precision 1)
 
-Connected pin "D2.2" to net "voltageRead".
+Disconnected pin "U2.1" from net "VCC".
+Disconnected pin "C5.1" from net "N0021".
+Disconnected pin "C5.2" from net "GND".
+
+Connected pin "C5.1" to net "GND".
+Connected pin "C5.2" to net "N0021".
+
+Net "GND" changed from net class "Signal" to net class "Ground".
+Net "VCC" changed from net class "Signal" to net class "Power".
+Net "bat+" changed from net class "Signal" to net class "Power".
 
 
 End Of Report.
