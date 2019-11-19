@@ -29,9 +29,24 @@ void loop() {
  valSensor = getSensorData();
  String getData = "GET /update?api_key="+ API +"&"+ field +"="+String(valSensor);
 sendCommand("AT+CIPMUX=1",5,"OK");
- sendCommand("AT+CIPSTART=0,\"TCP\",\""+ HOST +"\","+ PORT,15,"OK");
- sendCommand("AT+CIPSEND=0," +String(getData.length()+4),4,">");
- esp8266.println(getData);delay(1500);countTrueCommand++;
+ //sendCommand("AT+CIPSTART=0,\"TCP\",\""+ HOST +"\","+ PORT,15,"OK");
+ //instead of string concats do these commands manually
+ esp8266.print("AT+CIPSTART=0,\"TCP\",\"");
+ esp8266.print(HOST);
+ esp8266.print("\",");
+ esp8266.printnl(PORT);
+ 
+ //sendCommand("AT+CIPSEND=0," +String(getData.length()+4),4,">");
+ esp8266.print("AT+CIPSEND=0,");
+ esp8266.println(String(getData.length()+4)+API.length() + field.length()+22);///
+
+ //esp8266.println(getData);delay(1500);countTrueCommand++;
+ esp8266.print("GET /update?api_key=");
+ esp8266.print(API);
+ esp8266.print("&");
+ esp8266.print(field);
+ esp8266.print("=");
+ esp8266.println(String(valSensor));
  sendCommand("AT+CIPCLOSE=0",5,"OK");
 }
 int getSensorData(){
