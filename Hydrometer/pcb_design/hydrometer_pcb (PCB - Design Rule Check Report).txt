@@ -1,21 +1,22 @@
 Design Rule Check Report
 ------------------------
 
-Report Written:     Tuesday, November 19, 2019
+Report Written:     Wednesday, November 20, 2019
 Project Path:       C:\Users\ahall\Documents\git\arduino-projects\Hydrometer\pcb_design\hydrometer_pcb.prj
 Design Path:        C:\Users\ahall\Documents\git\arduino-projects\Hydrometer\pcb_design\hydrometer_pcb.pcb
 Design Title:       
 Created:            09/11/2019 22:41:41
-Last Saved:         19/11/2019 07:52:32
-Editing Time:       10489 min
+Last Saved:         20/11/2019 09:03:07
+Editing Time:       12005 min
 Units:              mm (precision 1)
 
 
 Results
 =======
 
+Dangling Track from (555.0,494.0) to (555.0,494.0) on layer Top Copper
 
-No errors found
+Number of errors found : 1
 
 
 Settings

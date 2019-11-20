@@ -27,8 +27,7 @@ pinMode(ledPin, OUTPUT);
      digitalWrite(ledPin,HIGH);
      delay(1000);
     digitalWrite(ledPin,LOW);
-//String AP = "***REMOVED***";       // CHANGE ME
-//String PASS = "***REMOVED***"; // CHANGE ME
+
 
 
 //Serial.begin(9600);
@@ -113,11 +112,11 @@ void sendCommand(String command, int maxTime, char readReplay[], bool led) {
 ////////////////send a single sensor reading to thingspeak
 void sendData(int sensorValue, String field){
 
-String API = F("API");  
+String API = F("S95CTTZ44KJG3C7M");  
 String HOST = F("api.thingspeak.com");
 String PORT = F("80");
   
-//String getData = "GET /update?api_key=***REMOVED***&field1="+String(valSensor); //String(valSensor)
+//String getData = "GET /update?api_key=S95CTTZ44KJG3C7M&field1="+String(valSensor); //String(valSensor)
 sendCommand(F("AT+CIPMUX=1"),5,"OK",false);
 delay(2000);
 
