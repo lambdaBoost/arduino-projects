@@ -27,8 +27,7 @@ pinMode(ledPin, OUTPUT);
      digitalWrite(ledPin,HIGH);
      delay(1000);
     digitalWrite(ledPin,LOW);
-//String AP = "VodafoneConnect59319678";       // CHANGE ME
-//String PASS = "peez4vwbpxw8aja"; // CHANGE ME
+
 
 
 //Serial.begin(9600);
@@ -113,7 +112,7 @@ void sendCommand(String command, int maxTime, char readReplay[], bool led) {
 ////////////////send a single sensor reading to thingspeak
 void sendData(int sensorValue, String field){
 
-String API = F("API");  
+String API = F("S95CTTZ44KJG3C7M");  
 String HOST = F("api.thingspeak.com");
 String PORT = F("80");
   

@@ -1,86 +1,18 @@
 Forward Design Changes Report
 -----------------------------
 
-Report Written:     Monday, November 18, 2019
+Report Written:     Wednesday, November 20, 2019
 Project Path:       C:\Users\ahall\Documents\git\arduino-projects\Hydrometer\pcb_design\hydrometer_pcb.prj
 Design Path:        C:\Users\ahall\Documents\git\arduino-projects\Hydrometer\pcb_design\hydrometer_pcb.pcb
 Design Title:       
 Created:            09/11/2019 22:41:41
-Last Saved:         18/11/2019 17:32:11
-Editing Time:       9788 min
+Last Saved:         20/11/2019 07:41:10
+Editing Time:       11925 min
 Units:              mm (precision 1)
 
-Disconnected pin "IC1.2" from net "N0113".
-Disconnected pin "IC1.3" from net "N0104".
-Disconnected pin "IC1.6" from net "N0118".
-Disconnected pin "IC2.4" from net "N0105".
-Disconnected pin "IC2.5" from net "N0112".
-Disconnected pin "Q1.1" from net "N0105".
-Disconnected pin "Q1.2" from net "VCC".
-Disconnected pin "Q1.3" from net "N0104".
-Disconnected pin "Q2.1" from net "ESP_en".
-Disconnected pin "Q2.2" from net "VCC".
-Disconnected pin "Q2.3" from net "N0118".
-Disconnected pin "Q3.1" from net "N0113".
-Disconnected pin "Q3.2" from net "bat+".
-Disconnected pin "Q3.3" from net "N0112".
-
-Deleted component reference "Q1".
-Deleted component reference "Q2".
-Deleted component reference "Q3".
-
-Deleted net "N0104".
-Deleted net "N0105".
-Deleted net "N0112".
-Deleted net "N0113".
-Deleted net "N0118".
-
-Added net "N0122".
-Added net "N0130".
-Added net "N0131".
-Added net "N0135".
-Added net "N0136".
-
-Added component reference "Q4" of component "2N7000", package "DSC".
-Added component reference "R1" of component "R 0.25W 5% MCF 4.7K", package "R 0.500".
-Added component reference "R2" of component "R 0.25W 5% MCF 4.7K", package "R 0.500".
-Added component reference "Q5" of component "2N7000", package "DSC".
-Added component reference "R5" of component "R 0.25W 5% MCF 4.7K", package "R 0.500".
-Added component reference "R6" of component "R 0.25W 5% MCF 4.7K", package "R 0.500".
-Added component reference "Q6" of component "2N7000", package "DSC".
-Added component reference "R7" of component "R 0.25W 5% MCF 4.7K", package "R 0.500".
-Added component reference "R8" of component "R 0.25W 5% MCF 4.7K", package "R 0.500".
-
-Connected pin "IC1.2" to net "N0135".
-Connected pin "IC1.3" to net "N0130".
-Connected pin "IC1.6" to net "N0122".
-Connected pin "IC2.4" to net "N0131".
-Connected pin "IC2.5" to net "N0136".
-Connected pin "Q4.2" to net "VCC".
-Connected pin "Q4.3" to net "N0122".
-Connected pin "Q4.1" to net "ESP_en".
-Connected pin "R1.1" to net "bat+".
-Connected pin "R1.2" to net "N0122".
-Connected pin "R2.1" to net "VCC".
-Connected pin "R2.2" to net "ESP_en".
-Connected pin "Q5.2" to net "VCC".
-Connected pin "Q5.3" to net "N0130".
-Connected pin "Q5.1" to net "N0131".
-Connected pin "R5.1" to net "bat+".
-Connected pin "R5.2" to net "N0130".
-Connected pin "R6.1" to net "VCC".
-Connected pin "R6.2" to net "N0131".
-Connected pin "Q6.2" to net "VCC".
-Connected pin "Q6.3" to net "N0135".
-Connected pin "Q6.1" to net "N0136".
-Connected pin "R7.1" to net "bat+".
-Connected pin "R7.2" to net "N0135".
-Connected pin "R8.1" to net "VCC".
-Connected pin "R8.2" to net "N0136".
-
-Net "GND" changed from net class "Signal" to net class "Ground".
+Net "GND" changed from net class "Signal" to net class "Power".
 Net "VCC" changed from net class "Signal" to net class "Power".
-Net "bat+" changed from net class "Signal" to net class "Power".
+Net "N0021" changed from net class "Signal" to net class "Power".
 
 
 End Of Report.
