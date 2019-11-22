@@ -6,13 +6,27 @@ Project Path:       C:\Users\ahall\Documents\git\arduino-projects\Hydrometer\pcb
 Design Path:        C:\Users\ahall\Documents\git\arduino-projects\Hydrometer\pcb_design\hydrometer_pcb.pcb
 Design Title:       
 Created:            09/11/2019 22:41:41
-Last Saved:         20/11/2019 07:41:10
-Editing Time:       11925 min
+Last Saved:         20/11/2019 12:27:50
+Editing Time:       12212 min
 Units:              mm (precision 1)
 
+Disconnected pin "U2.6" from net "GND".
+Disconnected pin "S1.1" from net "N0143".
+Disconnected pin "S1.2" from net "bat+".
+Disconnected pin "C5.1" from net "GND".
+
+Changed component reference "S1" from component "1-1437579-0", package "114375790" to component "JS202011CQN", package "JS202011CQN".
+
+Added net "N0161".
+
+Connected pin "U2.6" to net "N0161".
+Connected pin "C5.1" to net "N0161".
+Connected pin "S1.2" to net "GND".
+Connected pin "S1.3" to net "N0161".
+Connected pin "S1.5" to net "bat+".
+Connected pin "S1.6" to net "N0143".
+
 Net "GND" changed from net class "Signal" to net class "Power".
-Net "VCC" changed from net class "Signal" to net class "Power".
-Net "N0021" changed from net class "Signal" to net class "Power".
 
 
 End Of Report.
