@@ -20,7 +20,7 @@ SoftwareSerial esp8266(R,T);
 void setup()
 {
 
-  Serial.begin(9600);    ///////For Serial monitor 
+//  Serial.begin(9600);    ///////For Serial monitor 
   esp8266.begin(9600); ///////ESP Baud rate
 
 
@@ -37,9 +37,9 @@ void setup()
   String pass = EEPROM_readString(128);
   api = EEPROM_readString(256);
 
-  Serial.println(id);
-  Serial.println(pass);
-  Serial.println(api);
+//  Serial.println(id);
+ // Serial.println(pass);
+ // Serial.println(api);
 
 //go to station mode and login using credentials
   sendData("AT+RST\r\n",1000,DEBUG); // reset module
@@ -79,7 +79,7 @@ String sendData(String command, const int timeout, boolean debug)
                 response = getResponse(timeout);
                 if(debug)
                      {
-                     Serial.print(response); //displays the esp response messages in arduino Serial monitor
+                   //  Serial.print(response); //displays the esp response messages in arduino Serial monitor
                      }
                 return response;
             }
@@ -122,7 +122,7 @@ void serveLoginPage(int timeLimit){
      if(esp8266.find("ID="))
      { 
      String text = decodeURL(getResponse(2000));
-     Serial.println(text);
+//     Serial.println(text);
       //EXTRACT CREDENTIALS USING indexof() and substring()
       int id_idx = text.indexOf("&");
       int pass_start_idx = text.indexOf("=")+1;//first letter of password
