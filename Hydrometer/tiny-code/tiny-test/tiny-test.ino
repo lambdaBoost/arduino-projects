@@ -82,7 +82,7 @@ void connectToWifi(){
   // sendCommand(F("AT+CWMODE=1"),5,"OK",true);
   //delay(2000);
   //sendCommand("AT+CWJAP=\""+ SSID +"\",\""+ PASS +"\"",20,"OK",false);
-  sendCommand(F("AT+CWJAP=\"VodafoneConnect59319678\",\"peez4vwbpxw8aja\""), 20, "OK", true);
+  sendCommand(F("AT+CWJAP=\"SSID\",\"PASS\""), 20, "OK", true);
   delay(5000);
 }
 
@@ -135,7 +135,7 @@ void sendData(int val, String field) {
 
   String sensorValue = String(val);
 
-  String API = F("S95CTTZ44KJG3C7M");
+  String API = F("API");
   String HOST = F("api.thingspeak.com");
   String PORT = F("80");
 
