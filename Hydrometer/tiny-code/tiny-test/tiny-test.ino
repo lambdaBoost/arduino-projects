@@ -1,9 +1,14 @@
+
+
 #include <SoftwareSerial.h>
 #include<TinyWireM.h>
-//#include<EEPROM.h>
+#include<EEPROM.h>
+#include <avr/sleep.h>
+
+#define CH_PD 1
 #define RX 3
 #define TX 4
-int TEST_LED=1;
+int TEST_LED = 1;
 int countTrueCommand;
 int countTimeCommand;
 boolean found = false;
@@ -21,59 +26,113 @@ SoftwareSerial esp8266(RX, TX);
 #define WHO_AM_I 0x0D //THINK WE CAN DROP
 #define CTRL_REG1 0x2A
 #define MMA8452_ADDRESS 0x1D
-#define GSCALE 2
 
+int GSCALE = 2;
+
+volatile int watchdog_counter;
+//This runs each time the watch dog wakes us up from sleep
+ISR(WDT_vect) {
+  watchdog_counter++;
+}
 
 void setup()
 {
-pinMode(TEST_LED, OUTPUT);
- 
- digitalWrite(TEST_LED, HIGH);
- delay(1000);
- digitalWrite(TEST_LED, LOW);
- delay(1000);
-  
-  TinyWireM.begin(); 
- 
-  initMMA8452(); //THIS IS TRIPPING IT UP SOMEHOW - DEBUG THE FUNCTION. i think it's reading from the wrong register
+  pinMode(CH_PD, OUTPUT);
+
+  digitalWrite(CH_PD, HIGH);
+
+  TinyWireM.begin();
+
+  //initMMA8452();
 
   //Serial.begin(9600);
   esp8266.begin(9600);
 
 
-/*
-  SID=EEPROM_readString(1);
-  PASS=EEPROM_readString(100);
-  API=EEPROM_readString(200);
-  */
 
-  connectToWifi();
+  //SID=EEPROM_readString(1);
+  //PASS=EEPROM_readString(100);
+  //API=EEPROM_readString(200);
 
 
+  //connectToWifi();
 
+
+  watchdog_counter = 0;
+  //Power down various bits of hardware to lower power usage
+  set_sleep_mode(SLEEP_MODE_PWR_DOWN); //Power down everything, wake up from WDT
+  sleep_enable();
+  ADCSRA &= ~(1 << ADEN); //Disable ADC, saves ~230uA
+
+  setup_watchdog(9); //Wake up after 8 sec (I think)
+
+  digitalWrite(CH_PD, LOW);
 }
 
 
 void loop()
 {
 
-  int temp = getTempandVcc(true);
-  int vcc = getTempandVcc(false);
+  if (watchdog_counter == 0) {
 
-  int xAcc = readAccelData(0);
-  int yAcc = readAccelData(1);
-  int zAcc = readAccelData(2);
+    ADCSRA |= (1<<ADEN); //Enable ADC
 
-  sendData(temp, F("field1"));
-  sendData(vcc, F("field2"));
+    initMMA8452(); //DOES THIS GO HERE? NOT ABSOLUTELY SURE WE NEED TO REINITIALISE EVERY TIME
 
-  sendData(xAcc, F("field3"));
-  sendData(yAcc, F("field4"));
-  sendData(zAcc, F("field5"));
+    digitalWrite(CH_PD, HIGH);
+
+    connectToWifi();
+
+    int temp = getTempandVcc(true);
+    int vcc = getTempandVcc(false);
+
+    int xAcc = readAccelData(0);
+    int yAcc = readAccelData(1);
+    int zAcc = readAccelData(2);
+    int inclination = getInclination(xAcc, yAcc, zAcc);
+
+    sendData(inclination, F("field6"));
+    sendData(temp, F("field1"));
+    sendData(vcc, F("field2"));
+
+    //  Don't actually need to send these now that inclination calculation is done
+    //sendData(xAcc, F("field3"));
+    //sendData(yAcc, F("field4"));
+    //sendData(zAcc, F("field5"));
+    digitalWrite(CH_PD, LOW);
+    
+    ADCSRA &= ~(1<<ADEN); //Disable ADC, saves ~230uA
+  }
+
+  if (watchdog_counter > 30)
+  {
+
+    watchdog_counter = 0;
+
+  }
+
+  sleep_mode(); //Go to sleep!
+
+}
+
+//converts raw accelerometer values to inclination
+
+int getInclination(int x , int y , int z) {
+
+  x /= 10;
+  y /= 10;
+  z /= 10;
+
+  //this is 1000 * cos(inclination)
+  //102.4 because raw outputs are 1024 * actual g value and we already divided by 10 to allow for int operations
+  return 1000 * acos(1 / 102.4 * sq(z) / sqrt(sq(x) + sq(y) + sq(z)));
+
+  //USE THE ABOVE WITH AN EEPROM LOOKUP FOR ACOS TO GET FINAL INCLINATION
+
 }
 
 
-void connectToWifi(){
+void connectToWifi() {
 
   esp8266.println("AT+RST"); // reset module
   delay(10000);
@@ -166,12 +225,12 @@ void sendData(int val, String field) {
     countTrueCommand++;
     countTimeCommand = 0;
 
-/*
-    if (led == true) {
-      digitalWrite(ledPin, HIGH);
-      delay(1000);
-      digitalWrite(ledPin, LOW);
-    }
+    /*
+        if (led == true) {
+          digitalWrite(ledPin, HIGH);
+          delay(1000);
+          digitalWrite(ledPin, LOW);
+        }
     */
 
   }
@@ -276,7 +335,7 @@ float getTempandVcc(bool temp) {
     rawTemp += ((float)getADC() - rawTemp) / float(i);
   }
   ADCSRA &= ~(_BV(ADEN));        // disable ADC
-  
+
 
   // Measure chip voltage (Vcc)
   ADCSRA |= _BV(ADEN);   // Enable ADC
@@ -294,16 +353,16 @@ float getTempandVcc(bool temp) {
   //index 0..13 for vcc 1.7 ... 3.0
   vccIndex = min(max(17, (uint8_t)(rawVcc * 10)), 30) - 17;
 
-   // Temperature compensation using the chip voltage
+  // Temperature compensation using the chip voltage
   // with 3.0 V VCC is 1 lower than measured with 1.7 V VCC
   //t_celsius = (int)(chipTemp(rawTemp) + (float)vccIndex / 13);
   t_celsius = (chipTemp(rawTemp) + (float)vccIndex / 13);
 
-  if(temp==true){
-  return (int) 100*t_celsius;
+  if (temp == true) {
+    return (int) 100 * t_celsius;
   }
-  else{
-    return (int) 100*rawVcc;
+  else {
+    return (int) 100 * rawVcc;
   }
 
 }
@@ -314,175 +373,168 @@ float getTempandVcc(bool temp) {
 
 ////////////////mma8451 functions
 
- 
+
 //Test and initialize the accelerometer
 void initMMA8452()
 {
- //Read WHO_AM_I register. This is the first step to see if
- //communication can be estabilished with the MMA8452
- /*
- byte c = readRegister(WHO_AM_I);
- if(c == 0x2A)
- {
- digitalWrite(TEST_LED, HIGH);
- delay(1000);
- digitalWrite(TEST_LED, LOW);
- }
- else
- {
- while(1);
- }
- */
- 
- //Must be in standby mode to change registers
- MMA8452Standby();
- 
- //Set up full scale range to 2, 4, or 8g
- byte fsr = GSCALE;
- if(fsr > 8) fsr = 8; //Easy error check
- fsr >>= 2; //Neat trick, see page 22 of datasheet. 00 = 2G, 01 = 4A, 10 = 8G
- writeRegister(XYZ_DATA_CFG, fsr);
- 
- //The default data rate is 800Hz and we don't modify it in this example code
- 
- // Set to active to start reading
- MMA8452Active();
+  //Read WHO_AM_I register. This is the first step to see if
+  //communication can be estabilished with the MMA8452
+  /*
+    byte c = readRegister(WHO_AM_I);
+    if(c == 0x2A)
+    {
+    digitalWrite(TEST_LED, HIGH);
+    delay(1000);
+    digitalWrite(TEST_LED, LOW);
+    }
+    else
+    {
+    while(1);
+    }
+  */
+
+  //Must be in standby mode to change registers
+  MMA8452Standby();
+
+  //Set up full scale range to 2, 4, or 8g
+  byte fsr = GSCALE;
+  if (fsr > 8) fsr = 8; //Easy error check
+  fsr >>= 2; //Neat trick, see page 22 of datasheet. 00 = 2G, 01 = 4A, 10 = 8G
+  writeRegister(XYZ_DATA_CFG, fsr);
+
+  //The default data rate is 800Hz and we don't modify it in this example code
+
+  // Set to active to start reading
+  MMA8452Active();
 }
- 
+
 // Read a single byte from addressToRead and return it as a byte
 byte readRegister(byte addressToRead)
 {
- TinyWireM.beginTransmission(MMA8452_ADDRESS);
- TinyWireM.write(addressToRead);
- //endTransmission but keep the connection active (repeated start)
- TinyWireM.endTransmission(false); 
- 
- //Ask for 1 byte, once done, bus is released by default
- TinyWireM.requestFrom(MMA8452_ADDRESS, 1); 
- 
- while(!TinyWireM.available()) ; //Wait for the data to come back
- return TinyWireM.read(); //Return this one byte
+  TinyWireM.beginTransmission(MMA8452_ADDRESS);
+  TinyWireM.write(addressToRead);
+  //endTransmission but keep the connection active (repeated start)
+  TinyWireM.endTransmission(false);
+
+  //Ask for 1 byte, once done, bus is released by default
+  TinyWireM.requestFrom(MMA8452_ADDRESS, 1);
+
+  while (!TinyWireM.available()) ; //Wait for the data to come back
+  return TinyWireM.read(); //Return this one byte
 }
- 
+
 // Read bytesToRead sequentially, starting at addressToRead into the dest byte array
 void readRegisters(byte addressToRead, int bytesToRead, byte * dest)
 {
- TinyWireM.beginTransmission(MMA8452_ADDRESS);
- TinyWireM.write(addressToRead);
- TinyWireM.endTransmission(false); //endTransmission but keep the connection active
- 
- //Ask for bytes, once done, bus is released by default
- TinyWireM.requestFrom(MMA8452_ADDRESS, bytesToRead);
- //Hang out until we get the # of bytes we expect
- while(TinyWireM.available() < bytesToRead); 
- 
- for(int x = 0 ; x < bytesToRead ; x++)
- dest[x] = TinyWireM.read();
+  TinyWireM.beginTransmission(MMA8452_ADDRESS);
+  TinyWireM.write(addressToRead);
+  TinyWireM.endTransmission(false); //endTransmission but keep the connection active
+
+  //Ask for bytes, once done, bus is released by default
+  TinyWireM.requestFrom(MMA8452_ADDRESS, bytesToRead);
+  //Hang out until we get the # of bytes we expect
+  while (TinyWireM.available() < bytesToRead);
+
+  for (int x = 0 ; x < bytesToRead ; x++)
+    dest[x] = TinyWireM.read();
 }
- 
+
 // Writes a single byte (dataToWrite) into addressToWrite
 void writeRegister(byte addressToWrite, byte dataToWrite)
 {
- TinyWireM.beginTransmission(MMA8452_ADDRESS);
- TinyWireM.write(addressToWrite);
- TinyWireM.write(dataToWrite);
- TinyWireM.endTransmission(); //Stop transmitting
+  TinyWireM.beginTransmission(MMA8452_ADDRESS);
+  TinyWireM.write(addressToWrite);
+  TinyWireM.write(dataToWrite);
+  TinyWireM.endTransmission(); //Stop transmitting
 }
- 
+
 // Sets the MMA8452 to standby mode. It must be in standby to change most register settings
 void MMA8452Standby()
 {
- byte c = readRegister(CTRL_REG1);
- writeRegister(CTRL_REG1, c & ~(0x01)); //Clear the active bit to go into standby
+  byte c = readRegister(CTRL_REG1);
+  writeRegister(CTRL_REG1, c & ~(0x01)); //Clear the active bit to go into standby
 }
- 
+
 // Sets the MMA8452 to active mode. Needs to be in this mode to output data
 void MMA8452Active()
 {
- byte c = readRegister(CTRL_REG1);
- writeRegister(CTRL_REG1, c | 0x01); //Set the active bit to begin detection
+  byte c = readRegister(CTRL_REG1);
+  writeRegister(CTRL_REG1, c | 0x01); //Set the active bit to begin detection
 }
- 
+
 // converts raw accel data to g values. Can do this offline if we dont have enough memory
-/*
-void updateAccelData()
-{
- int accelCount[3]; // Stores the 12-bit signed value
- 
- readAccelData(accelCount); // Read the x/y/z adc values
- 
- // Now we'll calculate the accleration value into actual g's
- float accelG[3]; // Stores the real accel value in g's
- for (byte i = 0; i < 3; i++)
- {
- // get actual g value, this depends on scale being set
- accelG[i] = (float) accelCount[i] / ((1<<12)/(2*GSCALE)); 
- 
- // use a rolling filter
- currentAcc[i] = 0.95 * accelG[i] + currentAcc[i] * 0.05;
- }
-}
-*/
- 
+
+
 // Reads accel data from the MMA8452 i=axis 0-2
 int readAccelData(int i)
 {
- byte rawData[6]; // x/y/z accel register data stored here
- 
- readRegisters(OUT_X_MSB, 6, rawData); // Read the six raw data registers into data array
- 
- // Loop to calculate 12-bit ADC and g value for each axis
+  byte rawData[6]; // x/y/z accel register data stored here
 
- //Combine the two 8 bit registers (MSB and LSB) into one 12-bit number
- int gCount = (rawData[i*2] << 8) | rawData[(i*2)+1];
- gCount >>= 4; //The registers are left align, here we right align the 12-bit integer
- 
- // If the number is negative, we have to make it so manually (no 12-bit data type)
- if (rawData[i*2] > 0x7F)
- {
- // Transform into negative 2's complement #
- gCount = ~gCount + 1;
- gCount *= -1;
- }
- 
- //destination[i] = gCount; //Record this gCount into the 3 int array
- return gCount;
- 
+  readRegisters(OUT_X_MSB, 6, rawData); // Read the six raw data registers into data array
+
+  // Loop to calculate 12-bit ADC and g value for each axis
+
+  //Combine the two 8 bit registers (MSB and LSB) into one 12-bit number
+  int gCount = (rawData[i * 2] << 8) | rawData[(i * 2) + 1];
+  gCount >>= 4; //The registers are left align, here we right align the 12-bit integer
+
+  // If the number is negative, we have to make it so manually (no 12-bit data type)
+  if (rawData[i * 2] > 0x7F)
+  {
+    // Transform into negative 2's complement #
+    gCount = ~gCount + 1;
+    gCount *= -1;
+  }
+
+  //destination[i] = gCount; //Record this gCount into the 3 int array
+  return gCount;
+
 }
 
 
-/*
+
 ///////////EEPROM functions
-void EEPROM_writeString(int add,String data)
+void EEPROM_writeString(int add, String data)
 {
   int _size = data.length();
   int i;
-  for(i=0;i<_size;i++)
+  for (i = 0; i < _size; i++)
   {
-    EEPROM.update(add+i,data[i]);
+    EEPROM.update(add + i, data[i]);
   }
-  EEPROM.update(add+_size,'\0');   //Add termination null character for String Data
-
+  EEPROM.update(add + _size, '\0'); //Add termination null character for String Data
 }
- 
- 
+
+
 String EEPROM_readString(int add)
 {
   int i;
   char data[50]; //Max 50 Bytes - may need to optimise this if dynamic memory becomes an issue
-  int len=0;
+  int len = 0;
   unsigned char k;
-  k=EEPROM.read(add);
-  while(k != '\0' && len<500)   //Read until null character
-  {    
-    k=EEPROM.read(add+len);
-    data[len]=k;
+  k = EEPROM.read(add);
+  while (k != '\0' && len < 500) //Read until null character
+  {
+    k = EEPROM.read(add + len);
+    data[len] = k;
     len++;
   }
-  data[len]='\0';
+  data[len] = '\0';
   return String(data);
 }
 
 
-*/
+///////////watchdog timer
+void setup_watchdog(int timerPrescaler) {
 
+  if (timerPrescaler > 9 ) timerPrescaler = 9; //Correct incoming amount if need be
+
+  byte bb = timerPrescaler & 7;
+  if (timerPrescaler > 7) bb |= (1 << 5); //Set the special 5th bit if necessary
+
+  //This order of commands is important and cannot be combined
+  MCUSR &= ~(1 << WDRF); //Clear the watch dog reset
+  WDTCR |= (1 << WDCE) | (1 << WDE); //Set WD_change enable, set WD enable
+  WDTCR = bb; //Set new watchdog timeout value
+  WDTCR |= _BV(WDIE); //Set the interrupt enable, this will keep unit from resetting after each int
+}

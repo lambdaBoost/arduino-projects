@@ -6,6 +6,7 @@ Project Path:       C:\Users\ahall\Documents\git\arduino-projects\Hydrometer\pcb
 Design Path:        C:\Users\ahall\Documents\git\arduino-projects\Hydrometer\pcb_design\hydrometer_pcb.pcb
 Design Title:       
 Created:            09/11/2019 22:41:41
+<<<<<<< HEAD
 Last Saved:         20/11/2019 12:27:50
 Editing Time:       12212 min
 Units:              mm (precision 1)
@@ -27,6 +28,15 @@ Connected pin "S1.5" to net "bat+".
 Connected pin "S1.6" to net "N0143".
 
 Net "GND" changed from net class "Signal" to net class "Power".
+=======
+Last Saved:         20/11/2019 07:41:10
+Editing Time:       11925 min
+Units:              mm (precision 1)
+
+Net "GND" changed from net class "Signal" to net class "Power".
+Net "VCC" changed from net class "Signal" to net class "Power".
+Net "N0021" changed from net class "Signal" to net class "Power".
+>>>>>>> 8c0ab44e5e5af3773a48f24d5c3a008d93d1af96
 
 
 End Of Report.
